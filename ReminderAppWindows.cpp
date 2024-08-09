@@ -5,11 +5,19 @@
 #include "ReminderAppWindows.h"
 #include "combaseapi.h"
 #define MAX_LOADSTRING 100
+#define SUBMIT_DATE 198
+#include <iostream>
+
+using namespace std;
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
+WCHAR szTitle[MAX_LOADSTRING] = L"The High Performance Gaming Reminder App";                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+
+HWND button;
+HWND buttonOwner;
+HWND description;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -26,6 +34,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
+    MessageBox(NULL,L"starting base window",NULL, MB_OK);
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -99,32 +108,83 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Store instance handle in our global variable
+    hInst = hInstance; // Store instance handle in our global variable
 
-   //HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-   HWND hWnd = CreateWindowW(szWindowClass, L"reminder app :^                    )", WS_OVERLAPPEDWINDOW,
-           CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+    //HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+    HWND hWnd = CreateWindowW(szWindowClass, L"reminder app :^                    )", WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
+    if (!hWnd)
+    {
+        return FALSE;
+    }
+
+    buttonOwner = CreateWindowEx(
+        WS_EX_CLIENTEDGE,
+        L"ListBox",  // Predefined class; Unicode assumed, ListBox if want to display info without editing 
+        L"Submit",      // Button text 
+        WS_VISIBLE | WS_CHILD | WS_BORDER,  // Styles 
+       150,         // x position 
+       50,         // y position 
+       100,        //  width
+       100,        // height
+       hWnd,     // Parent window
+       NULL,       // No menu.
+       NULL,
+       NULL);
+   if (!buttonOwner) 
    {
-      return FALSE;
+       MessageBox(NULL, L"buttonOwner is nullptr", NULL, MB_OK);
+       return FALSE;
    }
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
-   HWND hwndButton = CreateWindow(
+  // description = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("Edit"), TEXT("test"),
+    //   WS_CHILD | WS_VISIBLE, 100, 20, 140,
+      // 20, hWnd, NULL, NULL, NULL);
+   
+   description = CreateWindowEx(
+       WS_EX_CLIENTEDGE | WS_EX_DLGMODALFRAME,
+       L"Edit",  // Predefined class; Unicode assumed, ListBox if want to display info without editing 
+       L"Enter here",      // Button text 
+       WS_VISIBLE | WS_CHILD | WS_BORDER,  // Styles 
+       50,         // x position 
+       50,         // y position 
+       100,        //  width
+       100,        // height
+       hWnd,     // Parent window
+       NULL,       // No menu.
+       NULL,
+       NULL);
+       
+   if (description) {
+       MessageBox(NULL, L"description created", NULL, MB_OK);
+   }
+   else {
+       MessageBox(NULL, L"error: description is nullptr", NULL, MB_OK);
+   }
+
+   button = CreateWindow(
        L"BUTTON",  // Predefined class; Unicode assumed 
        L"OK",      // Button text 
        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
-       10,         // x position 
-       10,         // y position 
+       0,         // x position 
+       0,         // y position 
        100,        // Button width
        100,        // Button height
        hWnd,     // Parent window
-       NULL,       // No menu.
+       (HMENU) SUBMIT_DATE,       // menu
        (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
        NULL);
+
+   if (button) {
+       MessageBox(NULL, L"button created", NULL, MB_OK);
+   }
+   else {
+       MessageBox(NULL, L"error: button is nullptr", NULL, MB_OK);
+   }
 
    return TRUE;
 }
@@ -154,6 +214,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
+                break;
+            case SUBMIT_DATE:
+                MessageBox(NULL, L"button pressed", NULL, MB_OK);
                 break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
