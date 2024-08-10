@@ -122,75 +122,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         return FALSE;
     }
     */
-    /*
-    buttonOwner = CreateWindowEx(
-        WS_EX_CLIENTEDGE,
-        L"ListBox",  // Predefined class; Unicode assumed, ListBox if want to display info without editing 
-        L"Submit",      // Button text 
-        WS_VISIBLE | WS_CHILD | WS_BORDER,  // Styles 
-       150,         // x position 
-       50,         // y position 
-       100,        //  width
-       100,        // height
-       hWnd,     // Parent window
-       NULL,       // No menu.
-       NULL,
-       NULL);
-   if (!buttonOwner) 
-   {
-       MessageBox(NULL, L"buttonOwner is nullptr", NULL, MB_OK);
-       return FALSE;
-   }
-   */
+
    //ShowWindow(baseWindow, nCmdShow);
    //UpdateWindow(baseWindow);
 
    InputScreen inputScreen(szWindowClass, hInst, nCmdShow);
-  // dayText = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("Edit"), TEXT("test"),
-    //   WS_CHILD | WS_VISIBLE, 100, 20, 140,
-      // 20, hWnd, NULL, NULL, NULL);
-   /*
-   dayText = CreateWindowEx(
-       WS_EX_CLIENTEDGE | WS_EX_DLGMODALFRAME,
-       L"Edit",  // Predefined class; Unicode assumed, ListBox if want to display info without editing 
-       L"Enter here",      // Button text 
-       WS_VISIBLE | WS_CHILD | WS_BORDER,  // Styles 
-       50,         // x position 
-       50,         // y position 
-       100,        //  width
-       100,        // height
-       baseWindow,     // Parent window
-       NULL,       // No menu.
-       NULL,
-       NULL);
-       
-   if (dayText) {
-       MessageBox(NULL, L"dayText created", NULL, MB_OK);
-   }
-   else {
-       MessageBox(NULL, L"error: dayText is nullptr", NULL, MB_OK);
-   }
-   
-   button = CreateWindow(
-       L"BUTTON",  // Predefined class; Unicode assumed 
-       L"OK",      // Button text 
-       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
-       150,         // x position 
-       50,         // y position 
-       100,        // Button width
-       100,        // Button height
-       baseWindow,     // Parent window
-       (HMENU) SUBMIT_DATE,       // menu
-       (HINSTANCE)GetWindowLongPtr(baseWindow, GWLP_HINSTANCE),
-       NULL);
 
-   if (button) {
-       MessageBox(NULL, L"button created", NULL, MB_OK);
-   }
-   else {
-       MessageBox(NULL, L"error: button is nullptr", NULL, MB_OK);
-   }
-   */
    return TRUE;
 }
 
@@ -221,6 +158,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 DestroyWindow(hWnd);
                 break;
             case SUBMIT_DATE:
+                MessageBox(NULL, L"button pressed", NULL, MB_OK);
                 if (dayText) {
                     WCHAR a[1000];
                     //LPSTR temp1;
