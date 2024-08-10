@@ -128,11 +128,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="InputScreen.h" />
     <ClInclude Include="ReminderAppWindows.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="InputScreen.cpp" />
     <ClCompile Include="ReminderAppWindows.cpp" />
   </ItemGroup>
   <ItemGroup>

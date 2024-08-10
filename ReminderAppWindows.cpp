@@ -4,6 +4,7 @@
 #include "framework.h"
 #include "ReminderAppWindows.h"
 #include "combaseapi.h"
+#include "InputScreen.h"
 #define MAX_LOADSTRING 100
 #define SUBMIT_DATE 198
 #include <iostream>
@@ -15,9 +16,10 @@ HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING] = L"The High Performance Gaming Reminder App";                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
+//HWND baseWindow;
 HWND button;
-HWND buttonOwner;
-HWND description;
+//HWND buttonOwner;
+HWND dayText;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -111,14 +113,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     hInst = hInstance; // Store instance handle in our global variable
 
     //HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-    HWND hWnd = CreateWindowW(szWindowClass, L"reminder app :^                    )", WS_OVERLAPPEDWINDOW,
+    /*
+    baseWindow = CreateWindowW(szWindowClass, L"reminder app :^                    )", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
-    if (!hWnd)
+    if (!baseWindow)
     {
         return FALSE;
     }
-
+    */
+    /*
     buttonOwner = CreateWindowEx(
         WS_EX_CLIENTEDGE,
         L"ListBox",  // Predefined class; Unicode assumed, ListBox if want to display info without editing 
@@ -137,15 +141,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        MessageBox(NULL, L"buttonOwner is nullptr", NULL, MB_OK);
        return FALSE;
    }
+   */
+   //ShowWindow(baseWindow, nCmdShow);
+   //UpdateWindow(baseWindow);
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-  // description = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("Edit"), TEXT("test"),
+   InputScreen inputScreen(szWindowClass, hInst, nCmdShow);
+  // dayText = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("Edit"), TEXT("test"),
     //   WS_CHILD | WS_VISIBLE, 100, 20, 140,
       // 20, hWnd, NULL, NULL, NULL);
-   
-   description = CreateWindowEx(
+   /*
+   dayText = CreateWindowEx(
        WS_EX_CLIENTEDGE | WS_EX_DLGMODALFRAME,
        L"Edit",  // Predefined class; Unicode assumed, ListBox if want to display info without editing 
        L"Enter here",      // Button text 
@@ -154,29 +159,29 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
        50,         // y position 
        100,        //  width
        100,        // height
-       hWnd,     // Parent window
+       baseWindow,     // Parent window
        NULL,       // No menu.
        NULL,
        NULL);
        
-   if (description) {
-       MessageBox(NULL, L"description created", NULL, MB_OK);
+   if (dayText) {
+       MessageBox(NULL, L"dayText created", NULL, MB_OK);
    }
    else {
-       MessageBox(NULL, L"error: description is nullptr", NULL, MB_OK);
+       MessageBox(NULL, L"error: dayText is nullptr", NULL, MB_OK);
    }
-
+   
    button = CreateWindow(
        L"BUTTON",  // Predefined class; Unicode assumed 
        L"OK",      // Button text 
        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
-       0,         // x position 
-       0,         // y position 
+       150,         // x position 
+       50,         // y position 
        100,        // Button width
        100,        // Button height
-       hWnd,     // Parent window
+       baseWindow,     // Parent window
        (HMENU) SUBMIT_DATE,       // menu
-       (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+       (HINSTANCE)GetWindowLongPtr(baseWindow, GWLP_HINSTANCE),
        NULL);
 
    if (button) {
@@ -185,7 +190,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    else {
        MessageBox(NULL, L"error: button is nullptr", NULL, MB_OK);
    }
-
+   */
    return TRUE;
 }
 
@@ -216,7 +221,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 DestroyWindow(hWnd);
                 break;
             case SUBMIT_DATE:
-                MessageBox(NULL, L"button pressed", NULL, MB_OK);
+                if (dayText) {
+                    WCHAR a[1000];
+                    //LPSTR temp1;
+                    LPWSTR temp = a;
+                    GetWindowTextW(dayText, temp, 1000);
+                    MessageBox(NULL, temp, NULL, MB_OK);
+                    //MessageBox(NULL, L"button pressed", NULL, MB_OK);
+                }
+                
                 break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
