@@ -30,12 +30,21 @@
     <ClInclude Include="InputScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CustomMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HelperFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReminderAppWindows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HelperFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

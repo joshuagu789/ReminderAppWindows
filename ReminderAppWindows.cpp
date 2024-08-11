@@ -5,8 +5,7 @@
 #include "ReminderAppWindows.h"
 #include "combaseapi.h"
 #include "InputScreen.h"
-#define MAX_LOADSTRING 100
-#define SUBMIT_DATE 198
+#include "CustomMacros.h"
 #include <iostream>
 
 using namespace std;
@@ -17,6 +16,8 @@ WCHAR szTitle[MAX_LOADSTRING] = L"The High Performance Gaming Reminder App";    
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
 //HWND baseWindow;
+unique_ptr<InputScreen> inputScreen;
+//InputScreen* inputScreen;
 HWND button;
 //HWND buttonOwner;
 HWND dayText;
@@ -55,6 +56,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+    //InputScreen inputScreen(szWindowClass, hInstance, nCmdShow);
+    inputScreen = std::make_unique<InputScreen>(szWindowClass, hInstance, nCmdShow);
+
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
@@ -64,6 +68,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         }
     }
+    //delete inputScreen;
     
     CoUninitialize();
 
@@ -126,7 +131,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    //ShowWindow(baseWindow, nCmdShow);
    //UpdateWindow(baseWindow);
 
-   InputScreen inputScreen(szWindowClass, hInst, nCmdShow);
+   
+   //inputScreen = &inputScreen1;
 
    return TRUE;
 }
@@ -159,6 +165,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case SUBMIT_DATE:
                 MessageBox(NULL, L"button pressed", NULL, MB_OK);
+                if (inputScreen) {
+                    inputScreen->UploadInput();
+                }
                 if (dayText) {
                     WCHAR a[1000];
                     //LPSTR temp1;
@@ -168,6 +177,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     //MessageBox(NULL, L"button pressed", NULL, MB_OK);
                 }
                 
+                break;
+            case SET_PRESENT_DATE:
+                if (inputScreen) {
+                    inputScreen->UpdateCurrentTime();
+                }
                 break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
