@@ -183,6 +183,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     inputScreen->UpdateCurrentTime();
                 }
                 break;
+            case ONE_MONTH_CHECK:
+                if (inputScreen) {
+                    inputScreen->ToggleCheckBox(ONE_MONTH_CHECK);
+                }
+                break;
+            case ONE_WEEK_CHECK:
+                if (inputScreen) {
+                    inputScreen->ToggleCheckBox(ONE_WEEK_CHECK);
+                }
+                break;
+            case THREE_DAY_CHECK:
+                if (inputScreen) {
+                    inputScreen->ToggleCheckBox(THREE_DAY_CHECK);
+                }
+                break;
+            case ONE_DAY_CHECK:
+                if (inputScreen) {
+                    inputScreen->ToggleCheckBox(ONE_DAY_CHECK);
+                }
+                break;
+            case SIX_HOUR_CHECK:
+                if (inputScreen) {
+                    inputScreen->ToggleCheckBox(SIX_HOUR_CHECK);
+                }
+                break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }

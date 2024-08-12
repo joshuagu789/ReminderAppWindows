@@ -5,12 +5,16 @@
 #include "HelperFunctions.h"
 
 #include <iostream>
+#include <fstream>
+#include <iostream>
 #include <chrono>
 #include <format>
 #include <ctime>
 #include <string>
-#include <thread>
+//#include <thread>
 #include <cwctype>
+
+//using namespace std;
 
 //void UpdateCurrentTime(HWND yearText, HWND monthText, HWND dayText, HWND hourText, HWND minuteText);    //forward declaration
 
@@ -46,12 +50,106 @@ InputScreen::InputScreen(LPCWSTR lpClassName, HINSTANCE hInstance, int nCmdShow)
         MessageBox(NULL, L"error: presentDateButton is nullptr for InputScreen", NULL, MB_OK);
         return;
     }
+    oneMonthCheck = CreateWindow(
+        L"BUTTON",  // Predefined class; Unicode assumed 
+        L"1 Month",      // Button text 
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_CHECKBOX,  // Styles 
+        200,         // x position 
+        200,         // y position 
+        100,        // Button width
+        100,        // Button height
+        baseWindow,     // Parent window
+        (HMENU) ONE_MONTH_CHECK,       // menu
+        (HINSTANCE)GetWindowLongPtr(baseWindow, GWLP_HINSTANCE),
+        NULL);
+
+    if (!oneMonthCheck) 
+    {
+        MessageBox(NULL, L"error: oneMonthCheck is nullptr for InputScreen", NULL, MB_OK);
+        return;
+    }
+
+    oneWeekCheck = CreateWindow(
+        L"BUTTON",  // Predefined class; Unicode assumed 
+        L"1 Week",      // Button text 
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_CHECKBOX,  // Styles 
+        300,         // x position 
+        200,         // y position 
+        100,        // Button width
+        100,        // Button height
+        baseWindow,     // Parent window
+        (HMENU) ONE_WEEK_CHECK,       // menu
+        (HINSTANCE)GetWindowLongPtr(baseWindow, GWLP_HINSTANCE),
+        NULL);
+
+    if (!oneWeekCheck)
+    {
+        MessageBox(NULL, L"error: oneWeekCheck is nullptr for InputScreen", NULL, MB_OK);
+        return;
+    }
+
+    threeDayCheck = CreateWindow(
+        L"BUTTON",  // Predefined class; Unicode assumed 
+        L"3 Day",      // Button text 
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_CHECKBOX,  // Styles 
+        400,         // x position 
+        200,         // y position 
+        100,        // Button width
+        100,        // Button height
+        baseWindow,     // Parent window
+        (HMENU) THREE_DAY_CHECK,       // menu
+        (HINSTANCE)GetWindowLongPtr(baseWindow, GWLP_HINSTANCE),
+        NULL);
+
+    if (!threeDayCheck)
+    {
+        MessageBox(NULL, L"error: threeDayCheck is nullptr for InputScreen", NULL, MB_OK);
+        return;
+    }
+
+    oneDayCheck = CreateWindow(
+        L"BUTTON",  // Predefined class; Unicode assumed 
+        L"1 Day",      // Button text 
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_CHECKBOX,  // Styles 
+        500,         // x position 
+        200,         // y position 
+        100,        // Button width
+        100,        // Button height
+        baseWindow,     // Parent window
+        (HMENU) ONE_DAY_CHECK,       // menu
+        (HINSTANCE)GetWindowLongPtr(baseWindow, GWLP_HINSTANCE),
+        NULL);
+
+    if (!oneDayCheck)
+    {
+        MessageBox(NULL, L"error: oneDayCheck is nullptr for InputScreen", NULL, MB_OK);
+        return;
+    }
+
+    sixHourCheck = CreateWindow(
+        L"BUTTON",  // Predefined class; Unicode assumed 
+        L"6 Hour",      // Button text 
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_CHECKBOX,  // Styles 
+        600,         // x position 
+        200,         // y position 
+        100,        // Button width
+        100,        // Button height
+        baseWindow,     // Parent window
+        (HMENU) SIX_HOUR_CHECK,       // menu
+        (HINSTANCE)GetWindowLongPtr(baseWindow, GWLP_HINSTANCE),
+        NULL);
+
+    if (!sixHourCheck)
+    {
+        MessageBox(NULL, L"error: sixHourCheck is nullptr for InputScreen", NULL, MB_OK);
+        return;
+    }
 
     submitButton = CreateWindow(
         L"BUTTON",  // Predefined class; Unicode assumed 
         L"SUBMIT DATE",      // Button text 
         WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
-        200,         // x position 
+        700,         // x position 
         200,         // y position 
         100,        // Button width
         100,        // Button height
@@ -237,6 +335,24 @@ InputScreen::~InputScreen()
     delete submitButton;
 }
 */
+
+void InputScreen::ToggleCheckBox(int id) 
+{
+    if (id != ONE_MONTH_CHECK && id != ONE_WEEK_CHECK && id != THREE_DAY_CHECK && id != ONE_DAY_CHECK && id != SIX_HOUR_CHECK) 
+    {
+        MessageBox(NULL, L"Error: id in ToggleCheckBox of InputScreen doesnt match any id of checkboxes", NULL, MB_OK);
+        return;
+    }
+    BOOL checked = IsDlgButtonChecked(baseWindow, id);
+    if (checked) {
+        CheckDlgButton(baseWindow, id, BST_UNCHECKED);
+    }
+    else {
+        CheckDlgButton(baseWindow, id, BST_CHECKED);
+    }
+}
+
+
 void InputScreen::UpdateCurrentTime() {
 //void UpdateCurrentTime(HWND yearText, HWND monthText, HWND dayText, HWND hourText, HWND minuteText) {
 
@@ -327,7 +443,7 @@ bool InputScreen::UploadInput()
     int inputLengths[5] = { 0 };
     std::string values[5] = { "" };
 
-    //for (HWND text : numericalInputs)
+    // check if number inputs contain any non number characters (includes spaces)
     for (int x = 0; x < 5; x++) 
     {
         HWND text = numericalInputs[x];
@@ -365,6 +481,7 @@ bool InputScreen::UploadInput()
         MessageBox(NULL, L"Warning: input field is empty", NULL, MB_OK);
         return false;
     }
+
     // character 0 is 48, character 9 is 57
     /*
     int year = StringToInteger(values[0]);
@@ -408,6 +525,12 @@ bool InputScreen::UploadInput()
         MessageBox(NULL, L"Warning: invalid value for minute", NULL, MB_OK);
         return false;
     }
+    //     Feb                      April                   June                        September               November
+    if (month == 2 && day > 29 || month == 4 && day > 30 || month == 6 && day > 30 || month == 9 && day > 30 || month == 11 && day > 30)
+    {
+        MessageBox(NULL, L"Warning: input field is empty", NULL, MB_OK);
+        return false;
+    }
     /*
     int tm_sec;   // seconds after the minute - [0, 60] including leap second
     int tm_min;   // minutes after the hour - [0, 59]
@@ -421,19 +544,63 @@ bool InputScreen::UploadInput()
     */
     //struct tm date {0, minute, hour, day, month-1, year-1900};
     struct tm date;
+    date.tm_sec = 0;
     date.tm_min = minute;
     date.tm_hour = hour;
     date.tm_mday = day;
     date.tm_mon = month - 1;
     date.tm_year = year - 1900;
+    date.tm_isdst = -1; 
+
     struct tm current = HelperFunctions::GetPresentTime();
 
     time_t date_t = mktime(&date);
     time_t current_t = mktime(&current);
+    const auto now = std::chrono::system_clock::now();
+    time_t timer = std::chrono::system_clock::to_time_t(now);
 
-    double difference = std::difftime(date_t, current_t);
-    int diff = difference;
-    double omg = std::difftime(date_t, date_t);
+    int difference = std::difftime(date_t, current_t);
+    if (difference <= 0) {
+        MessageBox(NULL, L"Warning: date of reminder is in the past", NULL, MB_OK);
+        return false;
+    }
+    // encode format is month-day-year-hour-minute-description-time_t-0-0-0-0-0  where 0's are booleans for if the reminder for 1 month, 1 week, 3 days, 1 day, or 6 hours
+    BOOL oneMonth = IsDlgButtonChecked(baseWindow, ONE_MONTH_CHECK);
+    BOOL oneWeek = IsDlgButtonChecked(baseWindow, ONE_WEEK_CHECK);
+    BOOL threeDay = IsDlgButtonChecked(baseWindow, THREE_DAY_CHECK);
+    BOOL oneDay = IsDlgButtonChecked(baseWindow, ONE_DAY_CHECK);
+    BOOL sixHour = IsDlgButtonChecked(baseWindow, SIX_HOUR_CHECK);
+
+    std::string output = "";
+    WCHAR a[1000];
+    //LPSTR temp1;
+    LPWSTR temp = a;
+    GetWindowTextW(descriptionText, temp, 1000);
+    int length = GetWindowTextLengthA(descriptionText);
+
+    std::string description = "";
+    for (int i = 0; i < length; i++) {
+        description += a[i];
+    }
+
+    output += std::to_string(month) + '-' + std::to_string(day) + '-' + std::to_string(year) + '-' + std::to_string(hour) + '-' + std::to_string(minute)
+              + '-' + description + '-' + std::to_string(date_t) + '-' + std::to_string(oneMonth) + '-' + std::to_string(oneWeek) + '-' + std::to_string(threeDay) + '-'
+              + std::to_string(oneDay) + '-' + std::to_string(sixHour) + "\n";
+
+
+    std::fstream remindersFile;
+    remindersFile.open(REMINDERS_FILE_NAME, std::fstream::in | std::fstream::out | std::fstream::app);
+
+    if (!remindersFile) {
+        MessageBox(NULL, L"Cannot find reminders.txt, creating new one", NULL, MB_OK);
+        std::ofstream newRemindersFile(REMINDERS_FILE_NAME);
+        newRemindersFile << output;
+        newRemindersFile.close();
+    }
+    else {
+        remindersFile << output;
+        remindersFile.close();
+    }
 
     MessageBox(NULL, L"success?", NULL, MB_OK);
 }
