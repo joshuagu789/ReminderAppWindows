@@ -4,49 +4,42 @@
 #include <iostream>
 #include <sstream>
 #include <chrono>
-#include "shellapi.h"
 #include <conio.h>
 
 ReminderProcesser::ReminderProcesser(HWND hwnd) 
 {
-
-	NOTIFYICONDATA nid = {};
-	nid.cbSize = sizeof(nid);
-	nid.hWnd = hwnd;
+	
+	balloon = {};
+	balloon.cbSize = sizeof(balloon);
+	balloon.hWnd = hwnd;
 	//nid.uFlags = NIF_ICON | NIF_TIP | NIF_GUID | NIF_MESSAGE | NIIF_RESPECT_QUIET_TIME;
 	//nid.uFlags = NIF_TIP | NIF_GUID | NIIF_RESPECT_QUIET_TIME;
-	nid.uFlags = NIF_ICON | NIF_TIP | NIF_INFO;
+	balloon.uFlags = NIF_ICON | NIF_TIP | NIF_INFO;
 
 	WCHAR temp[60] = L"C:/Users/joshu/source/repos/ReminderAppWindows/AppIcon.ico";
 	temp[59] = '\0';
 	LPWSTR temp2 = temp;
 
-	nid.hIcon = (HICON)LoadImage(NULL, temp2, IMAGE_ICON, 32, 32, LR_LOADFROMFILE | LR_SHARED);
+	balloon.hIcon = (HICON)LoadImage(NULL, temp2, IMAGE_ICON, 32, 32, LR_LOADFROMFILE | LR_SHARED);
 
 	std::string name = "High Performance Gaming Reminder App";
 	for (int i = 0; i < name.length(); i++) {
-		nid.szTip[i] = name.at(i);
+		balloon.szTip[i] = name.at(i);
 	}
-	nid.szTip[name.length()] = '\0';
+	balloon.szTip[name.length()] = '\0';
 
-	//nid.szInfoTitle[0] = 'c';
-	//nid.szInfo[0] = 'a';
-
-	// This text will be shown as the icon's tooltip.
-	//StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), L"Test application");
-
-	// Load the icon for high DPI.
-	//LoadIconMetric(hInst, MAKEINTRESOURCE(IDI_SMALL), LIM_SMALL, &(nid.hIcon));
+	balloon.szInfoTitle[0] = 'c';
+	balloon.szInfo[0] = 'a';
 
 	// Show the notification.
-	if (Shell_NotifyIcon(NIM_ADD, &nid)) {
-		//_getch();
-		MessageBox(NULL, L"yay", NULL, MB_OK);
+	if (Shell_NotifyIcon(NIM_ADD, &balloon)) {
+		//MessageBox(NULL, L"yay", NULL, MB_OK);
 	}
 	else {
-		MessageBox(NULL, L"nooo", NULL, MB_OK);
+		MessageBox(NULL, L"Registering icon not work for reminder app? ", NULL, MB_OK);
 	}
 	//Shell_NotifyIcon(NIM_DELETE, &nid)
+	
 }
 
 
@@ -58,7 +51,7 @@ void ReminderProcesser::ProcessReminders()
 {
 	std::fstream remindersFile;
 	std::vector<std::string> reminders;
-	std::queue<std::string> messagesToOutput;
+	std::queue<std::pair<std::string, std::string>> messagesToOutput;
 
 	remindersFile.open(REMINDERS_FILE_NAME, std::fstream::in | std::fstream::out | std::fstream::app);
 	if (!remindersFile)
@@ -96,32 +89,32 @@ void ReminderProcesser::ProcessReminders()
 									+ components.at(3) + ":" + components.at(4) + " (24 Hour Time Notation)";
 
 		if (oneMonth && difference <= ONE_MONTH_AS_SECONDS) {
-			messagesToOutput.push("One Month Reminder: " + notification);
+			messagesToOutput.push(std::make_pair("One Month Reminder: ", notification));
 			oneMonth = false;
 			components.at(7) = '0';
 		}
 		if (oneWeek && difference <= ONE_WEEK_AS_SECONDS) {
-			messagesToOutput.push("One Week Reminder: " + notification);
+			messagesToOutput.push(std::make_pair("One Week Reminder: ", notification));
 			oneWeek = false;
 			components.at(8) = '0';
 		}
 		if (threeDay && difference <= THREE_DAYS_AS_SECONDS) {
-			messagesToOutput.push("Three Day Reminder: " + notification);
+			messagesToOutput.push(std::make_pair("Three Day Reminder: ", notification));
 			threeDay = false;
 			components.at(9) = '0';
 		}
 		if (oneDay && difference <= ONE_DAY_AS_SECONDS) {
-			messagesToOutput.push("One Day Reminder: " + notification);
+			messagesToOutput.push(std::make_pair("One Day Reminder: ", notification));
 			oneDay = false;
 			components.at(10) = '0';
 		}
 		if (sixHour && difference <= SIX_HOURS_AS_SECONDS) {
-			messagesToOutput.push("Six Hour Reminder: " + notification);
+			messagesToOutput.push(std::make_pair("Six Hour Reminder: ", notification));
 			sixHour = false;
 			components.at(11) = '0';
 		}
 		if (difference <= 0) {
-			messagesToOutput.push("Reminder's Deadline: " + notification);
+			messagesToOutput.push(std::make_pair("Reminder's Deadline: ", notification));
 			present = false;
 			//oneMonth = false;
 			//components.at(7) = '0';
@@ -141,6 +134,7 @@ void ReminderProcesser::ProcessReminders()
 	// sending out notifications
 	while (!messagesToOutput.empty()) 
 	{
+		/*
 		std::string message = messagesToOutput.front();
 		messagesToOutput.pop();
 		WCHAR temp[MAX_LOADSTRING];
@@ -153,17 +147,40 @@ void ReminderProcesser::ProcessReminders()
 		LPWSTR pointer = temp;
 
 		MessageBox(NULL, pointer, NULL, MB_OK);
-		/*
-		NOTIFYICONDATA notification = {};
-		Shell_NotifyIcon(NIM_ADD, &notification);
-		char temp2[MAX_LOADSTRING];
-
-		//notification.szInfoTitle;
-		for (int i = 0; i < message.length(); i++) {
-			notification.szInfo[i] = message[i];
-		}
 		*/
-			
+		std::string messageTitle = messagesToOutput.front().first;
+		std::string messageBody = messagesToOutput.front().second;
+
+		int titleLength = (messageTitle.length() > 47) ? (47) : (messageTitle.length());
+		int bodyLength = (messageBody.length() > 199) ? (199) : (messageBody.length());
+
+		for (int x = 0; x < titleLength; x++) {
+			balloon.szInfoTitle[x] = messageTitle.at(x);
+		}
+		balloon.szInfoTitle[titleLength] = '\0';
+
+		for (int y = 0; y < bodyLength; y++) {
+			balloon.szInfo[y] = messageBody.at(y);
+		}
+		balloon.szInfo[bodyLength] = '\0';
+
+		if (Shell_NotifyIcon(NIM_MODIFY, &balloon)) {
+			//MessageBox(NULL, L"yay", NULL, MB_OK);
+		}
+		else {
+			std::string message = messagesToOutput.front().first + messagesToOutput.front().second;
+			messagesToOutput.pop();
+			WCHAR temp[MAX_LOADSTRING];
+			int i = 0;
+			while (i < message.length()) {
+				temp[i] = message.at(i);
+				i++;
+			}
+			temp[i] = '\0';
+			LPWSTR pointer = temp;
+
+			MessageBox(NULL, pointer, NULL, MB_OK);
+		}
 	}
 
 	// regenerating text file reminders.txt

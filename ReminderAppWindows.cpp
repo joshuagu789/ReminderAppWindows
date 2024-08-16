@@ -9,7 +9,7 @@
 #include "CustomMacros.h"
 #include <iostream>
 
-using namespace std;
+//using namespace std;
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
@@ -17,8 +17,8 @@ WCHAR szTitle[MAX_LOADSTRING] = L"The High Performance Gaming Reminder App";    
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
 //HWND baseWindow;
-unique_ptr<InputScreen> inputScreen;
-unique_ptr<ReminderProcesser> processer;
+std::unique_ptr<InputScreen> inputScreen;
+std::unique_ptr<ReminderProcesser> processer;
 
 //InputScreen* inputScreen;
 HWND button;
