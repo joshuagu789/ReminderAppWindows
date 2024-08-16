@@ -7,6 +7,7 @@
 #include "InputScreen.h"
 #include "ReminderProcesser.h"
 #include "CustomMacros.h"
+#include "shellapi.h"
 #include <iostream>
 
 //using namespace std;
@@ -20,16 +21,14 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 std::unique_ptr<InputScreen> inputScreen;
 std::unique_ptr<ReminderProcesser> processer;
 
-//InputScreen* inputScreen;
-HWND button;
-//HWND buttonOwner;
-HWND dayText;
+NOTIFYICONDATA balloon;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+void CheckReminders();
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -62,14 +61,48 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     //InputScreen inputScreen(szWindowClass, hInstance, nCmdShow);
     inputScreen = std::make_unique<InputScreen>(szWindowClass, hInstance, nCmdShow);
     if (inputScreen) {
-        processer = std::make_unique<ReminderProcesser>(inputScreen->GetBaseWindow());
+        processer = std::make_unique<ReminderProcesser>();
     }
     else {
         return FALSE;
     }
 
+    balloon = {};
+    balloon.cbSize = sizeof(balloon);
+    balloon.hWnd = inputScreen->GetBaseWindow();
+    //nid.uFlags = NIF_ICON | NIF_TIP | NIF_GUID | NIF_MESSAGE | NIIF_RESPECT_QUIET_TIME;
+    //nid.uFlags = NIF_TIP | NIF_GUID | NIIF_RESPECT_QUIET_TIME;
+    balloon.uFlags = NIF_ICON | NIF_TIP | NIF_INFO;
+
+    WCHAR temp[60] = L"C:/Users/joshu/source/repos/ReminderAppWindows/AppIcon.ico";
+    temp[59] = '\0';
+    LPWSTR temp2 = temp;
+
+    balloon.hIcon = (HICON)LoadImage(NULL, temp2, IMAGE_ICON, 32, 32, LR_LOADFROMFILE | LR_SHARED);
+
+    std::string name = "High Performance Gaming Reminder App";
+    for (int i = 0; i < name.length(); i++) {
+        balloon.szTip[i] = name.at(i);
+    }
+    balloon.szTip[name.length()] = '\0';
+
+    balloon.szInfoTitle[0] = 'c';
+    balloon.szInfo[0] = 'a';
+
+    // Show the notification.
+    if (Shell_NotifyIcon(NIM_ADD, &balloon)) {
+        //MessageBox(NULL, L"yay", NULL, MB_OK);
+    }
+    else {
+        MessageBox(NULL, L"Registering icon not work for reminder app? ", NULL, MB_OK);
+    }
+    //Shell_NotifyIcon(NIM_DELETE, &nid)
+
+    //if (processer) {
+    //    SetTimer(NULL, 0, 1000 * 60, (TIMERPROC)& processer->ProcessReminders);
+    //}
     if (processer) {
-        SetTimer(NULL, 0, 1000 * 60, (TIMERPROC)& processer->ProcessReminders);
+        SetTimer(NULL, 0, 1000 * 60, (TIMERPROC)&CheckReminders);
     }
     else {
         return FALSE;
@@ -185,17 +218,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (inputScreen) {
                     inputScreen->UploadInput();
                 }
-                if (processer) {
-                    //processer->ProcessReminders();
-                }
-                if (dayText) {
-                    WCHAR a[1000];
-                    //LPSTR temp1;
-                    LPWSTR temp = a;
-                    GetWindowTextW(dayText, temp, 1000);
-                    MessageBox(NULL, temp, NULL, MB_OK);
-                    //MessageBox(NULL, L"button pressed", NULL, MB_OK);
-                }
                 
                 break;
             case SET_PRESENT_DATE:
@@ -277,4 +299,12 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+void CheckReminders() {
+    MessageBox(NULL, L"check reminders", NULL, MB_OK);
+    if (processer) {
+        processer->ProcessReminders(balloon);
+
+    }
 }

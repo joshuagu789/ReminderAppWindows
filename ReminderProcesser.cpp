@@ -6,39 +6,10 @@
 #include <chrono>
 #include <conio.h>
 
-ReminderProcesser::ReminderProcesser(HWND hwnd) 
+
+ReminderProcesser::ReminderProcesser() 
 {
-	
-	balloon = {};
-	balloon.cbSize = sizeof(balloon);
-	balloon.hWnd = hwnd;
-	//nid.uFlags = NIF_ICON | NIF_TIP | NIF_GUID | NIF_MESSAGE | NIIF_RESPECT_QUIET_TIME;
-	//nid.uFlags = NIF_TIP | NIF_GUID | NIIF_RESPECT_QUIET_TIME;
-	balloon.uFlags = NIF_ICON | NIF_TIP | NIF_INFO;
 
-	WCHAR temp[60] = L"C:/Users/joshu/source/repos/ReminderAppWindows/AppIcon.ico";
-	temp[59] = '\0';
-	LPWSTR temp2 = temp;
-
-	balloon.hIcon = (HICON)LoadImage(NULL, temp2, IMAGE_ICON, 32, 32, LR_LOADFROMFILE | LR_SHARED);
-
-	std::string name = "High Performance Gaming Reminder App";
-	for (int i = 0; i < name.length(); i++) {
-		balloon.szTip[i] = name.at(i);
-	}
-	balloon.szTip[name.length()] = '\0';
-
-	balloon.szInfoTitle[0] = 'c';
-	balloon.szInfo[0] = 'a';
-
-	// Show the notification.
-	if (Shell_NotifyIcon(NIM_ADD, &balloon)) {
-		//MessageBox(NULL, L"yay", NULL, MB_OK);
-	}
-	else {
-		MessageBox(NULL, L"Registering icon not work for reminder app? ", NULL, MB_OK);
-	}
-	//Shell_NotifyIcon(NIM_DELETE, &nid)
 	
 }
 
@@ -47,7 +18,7 @@ ReminderProcesser::ReminderProcesser(HWND hwnd)
 	Assumes reminder encoding is like:
 	Encode format is month-day-year-hour-minute-description-time_t-0-0-0-0-0  where 0's are booleans for if the reminder for 1 month, 1 week, 3 days, 1 day, or 6 hours
 */
-void ReminderProcesser::ProcessReminders()
+void ReminderProcesser::ProcessReminders(NOTIFYICONDATA& balloon)
 {
 	std::fstream remindersFile;
 	std::vector<std::string> reminders;
@@ -150,6 +121,7 @@ void ReminderProcesser::ProcessReminders()
 		*/
 		std::string messageTitle = messagesToOutput.front().first;
 		std::string messageBody = messagesToOutput.front().second;
+		messagesToOutput.pop();
 
 		int titleLength = (messageTitle.length() > 47) ? (47) : (messageTitle.length());
 		int bodyLength = (messageBody.length() > 199) ? (199) : (messageBody.length());
@@ -168,8 +140,7 @@ void ReminderProcesser::ProcessReminders()
 			//MessageBox(NULL, L"yay", NULL, MB_OK);
 		}
 		else {
-			std::string message = messagesToOutput.front().first + messagesToOutput.front().second;
-			messagesToOutput.pop();
+			std::string message = messageTitle + messageBody;
 			WCHAR temp[MAX_LOADSTRING];
 			int i = 0;
 			while (i < message.length()) {

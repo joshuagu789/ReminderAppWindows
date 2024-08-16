@@ -14,15 +14,15 @@ private:
 
 	//std::unordered_set<std::string> reminders;
 	//std::queue<std::string> messagesToOutput;
-	//struct NOTIFYICONDATA balloon = {};
-	std::unique_ptr<NOTIFYICONDATA> balloon;
+	//NOTIFYICONDATA balloon;
+	//std::unique_ptr<NOTIFYICONDATA> balloon;
 
 	ReminderProcesser(const ReminderProcesser& other) = delete;	// no copy constructor
 	ReminderProcesser& operator=(const ReminderProcesser& other) = delete;	// no copy assignment
 	ReminderProcesser(ReminderProcesser&& other) = delete;	// no move constructor
 	ReminderProcesser& operator=(ReminderProcesser&& other) = delete;	// no move assignment
 public:
-	ReminderProcesser(HWND);
-	static void ProcessReminders();
+	ReminderProcesser();
+	static void ProcessReminders(NOTIFYICONDATA& balloon);
 };
 
