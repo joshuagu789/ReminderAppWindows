@@ -132,6 +132,7 @@
     <ClInclude Include="HelperFunctions.h" />
     <ClInclude Include="InputScreen.h" />
     <ClInclude Include="ReminderAppWindows.h" />
+    <ClInclude Include="ReminderProcesser.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -139,6 +140,7 @@
     <ClCompile Include="HelperFunctions.cpp" />
     <ClCompile Include="InputScreen.cpp" />
     <ClCompile Include="ReminderAppWindows.cpp" />
+    <ClCompile Include="ReminderProcesser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ReminderAppWindows.rc" />

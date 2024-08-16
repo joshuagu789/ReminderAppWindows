@@ -5,6 +5,7 @@
 #include "ReminderAppWindows.h"
 #include "combaseapi.h"
 #include "InputScreen.h"
+#include "ReminderProcesser.h"
 #include "CustomMacros.h"
 #include <iostream>
 
@@ -17,6 +18,8 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
 //HWND baseWindow;
 unique_ptr<InputScreen> inputScreen;
+unique_ptr<ReminderProcesser> processer;
+
 //InputScreen* inputScreen;
 HWND button;
 //HWND buttonOwner;
@@ -37,7 +40,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
-    MessageBox(NULL,L"starting base window",NULL, MB_OK);
+    //MessageBox(NULL,L"starting base window",NULL, MB_OK);
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -58,6 +61,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     //InputScreen inputScreen(szWindowClass, hInstance, nCmdShow);
     inputScreen = std::make_unique<InputScreen>(szWindowClass, hInstance, nCmdShow);
+    if (inputScreen) {
+        processer = std::make_unique<ReminderProcesser>(inputScreen->GetBaseWindow());
+    }
+    else {
+        return FALSE;
+    }
+
+    if (processer) {
+        SetTimer(NULL, 0, 1000 * 60, (TIMERPROC)& processer->ProcessReminders);
+    }
+    else {
+        return FALSE;
+    }
+    //SetTimer(NULL, PROCESS_REMINDERS_TIMER, 1000 * 60, NULL);
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -164,9 +181,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 DestroyWindow(hWnd);
                 break;
             case SUBMIT_DATE:
-                MessageBox(NULL, L"button pressed", NULL, MB_OK);
+                //MessageBox(NULL, L"button pressed", NULL, MB_OK);
                 if (inputScreen) {
                     inputScreen->UploadInput();
+                }
+                if (processer) {
+                    //processer->ProcessReminders();
                 }
                 if (dayText) {
                     WCHAR a[1000];
@@ -213,6 +233,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+    /*
+    case WM_TIMER:
+        MessageBox(NULL, L"pls timer", NULL, MB_OK);
+        if (wParam == PROCESS_REMINDERS_TIMER) {
+            MessageBox(NULL, L"one second passed", NULL, MB_OK);
+        }
+    */
     case WM_PAINT:
         {
             PAINTSTRUCT ps;

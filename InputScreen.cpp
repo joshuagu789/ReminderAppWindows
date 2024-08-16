@@ -4,7 +4,6 @@
 #include "CustomMacros.h"
 #include "HelperFunctions.h"
 
-#include <iostream>
 #include <fstream>
 #include <iostream>
 #include <chrono>
@@ -421,7 +420,7 @@ void InputScreen::UpdateCurrentTime() {
 
         //std::this_thread::sleep_for(std::chrono::seconds(10));
         
-        MessageBox(NULL, L"update text called", NULL, MB_OK);
+        //MessageBox(NULL, L"update text called", NULL, MB_OK);
     }
     //std::this_thread::sleep_for(std::chrono::seconds(2));
     //UpdateCurrentTime(yearText, monthText, dayText, hourText, minuteText);
@@ -431,6 +430,9 @@ bool InputScreen::InputScreenIsValid() {
     return baseWindow && caption && yearText && monthText && dayText && hourText && minuteText && submitButton && descriptionText;
 }
 
+/*
+    Encode format is month-day-year-hour-minute-description-time_t-0-0-0-0-0  where 0's are booleans for if the reminder for 1 month, 1 week, 3 days, 1 day, or 6 hours
+*/
 bool InputScreen::UploadInput()
 {
     //if (!yearText || !monthText || !dayText || !hourText || !minuteText || !descriptionText) { return false; }
@@ -582,6 +584,13 @@ bool InputScreen::UploadInput()
     for (int i = 0; i < length; i++) {
         description += a[i];
     }
+    for (int i = 0; i < description.length(); i++) 
+    {
+        if(description[i] == '\n' || description[i] == '-'){
+            MessageBox(NULL, L"Error: description contains special characters (either newline or -), cancelling reminder", NULL, MB_OK);
+            return false;
+        }
+    }
 
     output += std::to_string(month) + '-' + std::to_string(day) + '-' + std::to_string(year) + '-' + std::to_string(hour) + '-' + std::to_string(minute)
               + '-' + description + '-' + std::to_string(date_t) + '-' + std::to_string(oneMonth) + '-' + std::to_string(oneWeek) + '-' + std::to_string(threeDay) + '-'
@@ -602,5 +611,9 @@ bool InputScreen::UploadInput()
         remindersFile.close();
     }
 
-    MessageBox(NULL, L"success?", NULL, MB_OK);
+    MessageBox(NULL, L"Reminder Successfully Set", NULL, MB_OK);
+}
+
+HWND InputScreen::GetBaseWindow() {
+    return baseWindow; 
 }
