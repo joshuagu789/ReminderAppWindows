@@ -86,9 +86,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
     balloon.szTip[name.length()] = '\0';
 
-    balloon.szInfoTitle[0] = 'c';
-    balloon.szInfo[0] = 'a';
-
     // Show the notification.
     if (Shell_NotifyIcon(NIM_ADD, &balloon)) {
         //MessageBox(NULL, L"yay", NULL, MB_OK);

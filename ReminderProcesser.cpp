@@ -56,8 +56,13 @@ void ReminderProcesser::ProcessReminders(NOTIFYICONDATA& balloon)
 		time_t finishTime = std::stol(components.at(6));
 
 		long long difference = finishTime - timer;	//negative if finish time in past
-		std::string notification = components.at(5) + " scheduled for " + components.at(0) + "/" + components.at(1) + "/" + components.at(2) + " (Month/Day/Year) at time " 
-									+ components.at(3) + ":" + components.at(4) + " (24 Hour Time Notation)";
+
+		// leading zeroes if in single digits
+		std::string day = (components.at(1).length() == 1) ? ('0' + components.at(1)) : (components.at(1));
+		std::string minute = (components.at(4).length() == 1) ? ('0' + components.at(4)) : (components.at(4));
+
+		std::string notification = components.at(5) + " scheduled for " + components.at(0) + "/" + day + "/" + components.at(2) + " (Month/Day/Year) at time " 
+									+ components.at(3) + ":" + minute + " (24 Hour Time Notation)";
 
 		if (oneMonth && difference <= ONE_MONTH_AS_SECONDS) {
 			messagesToOutput.push(std::make_pair("One Month Reminder: ", notification));
