@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <chrono>
+#include <filesystem>
 #include <conio.h>
 
 
@@ -27,14 +28,14 @@ void ReminderProcesser::ProcessReminders(NOTIFYICONDATA& balloon)
 	remindersFile.open(REMINDERS_FILE_NAME, std::fstream::in | std::fstream::out | std::fstream::app);
 	if (!remindersFile)
 	{
-		//MessageBox(NULL, L"Cannot find reminders.txt in ReminderProcesser", NULL, MB_OK);
+		MessageBox(NULL, L"Cannot find reminders.txt in ReminderProcesser", NULL, MB_OK);
 		return;
 	}
 
 	std::string line = "";
 	while (std::getline(remindersFile, line))
 	{
-		if (line.empty() || line.size() == 0) { return; }
+		if (line.empty() || line.size() == 0 || line.at(0) == ' ') { return; }
 		std::stringstream lineStream(line);
 		std::vector<std::string> components;
 		std::string component;

@@ -99,7 +99,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     //    SetTimer(NULL, 0, 1000 * 60, (TIMERPROC)& processer->ProcessReminders);
     //}
     if (processer) {
-        SetTimer(NULL, 0, 1000 * 60, (TIMERPROC)&CheckReminders);
+        SetTimer(NULL, 0, 1000 * 30, (TIMERPROC)&CheckReminders);
     }
     else {
         return FALSE;
@@ -131,6 +131,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
+    WCHAR temp[60] = L"C:/Users/joshu/source/repos/ReminderAppWindows/AppIcon.ico";
+    temp[59] = '\0';
+    LPWSTR temp2 = temp;
+
     WNDCLASSEXW wcex;
 
     wcex.cbSize = sizeof(WNDCLASSEX);
@@ -140,7 +144,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
     wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_REMINDERAPPWINDOWS));
+    //wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_REMINDERAPPWINDOWS)); 
+    wcex.hIcon = (HICON)LoadImage(NULL, temp2, IMAGE_ICON, 32, 32, LR_LOADFROMFILE | LR_SHARED);
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
     wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_REMINDERAPPWINDOWS);
@@ -198,6 +203,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+    case WM_CLOSE:
+        if (inputScreen) {
+            ShowWindow(inputScreen->GetBaseWindow(), SW_SHOWMINIMIZED);  // hiding window rather than delete
+        }
+        break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -270,6 +280,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_DESTROY:
+        Shell_NotifyIcon(NIM_DELETE, &balloon);
         PostQuitMessage(0);
         break;
     default:
@@ -299,7 +310,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 void CheckReminders() {
-    MessageBox(NULL, L"check reminders", NULL, MB_OK);
+    //MessageBox(NULL, L"check reminders", NULL, MB_OK);
     if (processer) {
         processer->ProcessReminders(balloon);
 
